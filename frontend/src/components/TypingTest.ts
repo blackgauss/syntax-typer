@@ -79,7 +79,7 @@ export class TypingTest {
     // Live diff render directly into the display
     const states = diffChars(target, typed);
     const display = this.container.querySelector<HTMLPreElement>("#snippet-display")!;
-    display.innerHTML = renderDiff(states);
+    display.innerHTML = renderDiff(states, this.snippet.language);
 
     pluginManager.triggerKeyPress(typed[typed.length - 1] ?? "", Date.now());
 
@@ -144,7 +144,7 @@ export class TypingTest {
           <span class="snippet-diff">${this.snippet.difficulty}</span>
         </div>
         <div class="display-wrapper">
-          <pre id="snippet-display" tabindex="0">${renderDiff(states)}</pre>
+          <pre id="snippet-display" tabindex="0">${renderDiff(states, this.snippet.language)}</pre>
           <div class="click-to-focus">Click to focus</div>
           <textarea
             id="typing-input"

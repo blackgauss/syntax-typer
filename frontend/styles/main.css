@@ -70,15 +70,40 @@ header h1 {
 }
 
 .char { position: relative; }
-.char.correct   { color: var(--correct); }
-.char.incorrect { color: var(--incorrect); text-decoration: underline wavy var(--incorrect); }
-.char.pending   { color: var(--pending); }
+
+/* Pending chars: show Prism syntax colour (inherited from outer token span) */
+.char.pending   { color: inherit; opacity: 0.4; }
+
+/* Typed chars: override with result colour */
+.char.correct   { color: var(--correct); opacity: 1; }
+.char.incorrect { color: var(--incorrect); opacity: 1; text-decoration: underline wavy var(--incorrect); }
+
 .char.cursor {
   color: var(--cursor-fg);
   background: var(--cursor-bg);
   border-radius: 2px;
   animation: blink 1s step-end infinite;
 }
+
+/* ── Prism token colours (Catppuccin-style palette) ── */
+.token.keyword            { color: #cba6f7; } /* mauve */
+.token.builtin            { color: #89dceb; }
+.token.function           { color: #89b4fa; } /* blue */
+.token.class-name         { color: #f9e2af; } /* yellow */
+.token.string             { color: #a6e3a1; } /* green */
+.token.template-string    { color: #a6e3a1; }
+.token.number             { color: #fab387; } /* peach */
+.token.boolean            { color: #fab387; }
+.token.operator           { color: #89dceb; } /* sky */
+.token.punctuation        { color: #9399b2; } /* overlay2 */
+.token.comment            { color: #6c7086; font-style: italic; } /* muted */
+.token.parameter          { color: #f38ba8; } /* red */
+.token.type               { color: #f9e2af; }
+.token.decorator          { color: #f5c2e7; } /* pink */
+.token.property           { color: #cdd6f4; }
+.token.attr-name          { color: #89b4fa; }
+.token.regex              { color: #f38ba8; }
+.token.important          { color: #fab387; font-weight: bold; }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }

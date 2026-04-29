@@ -36,7 +36,8 @@ export class KeyLogger {
         input.value =
           input.value.substring(0, start) + "    " + input.value.substring(end);
         input.selectionStart = input.selectionEnd = start + 4;
-        // Fire as 4 space characters
+        // Manually fire input event so TypingTest.onInput() picks up the change
+        input.dispatchEvent(new Event("input", { bubbles: true }));
         "    ".split("").forEach((_, i) =>
           this._emit({ key: " ", timestamp: Date.now() + i, isCorrection: false, isSpecial: false })
         );
