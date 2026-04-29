@@ -219,3 +219,12 @@ __marimo__/
 
 # Syntax Typer — internal design docs
 design-plan.md
+
+# uv
+.venv/
+uv.lock
+
+# Frontend
+node_modules/
+frontend/dist/
+package-lock.json
