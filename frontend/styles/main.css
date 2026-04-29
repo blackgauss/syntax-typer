@@ -74,8 +74,10 @@ header h1 {
 /* Pending chars: show Prism syntax colour (inherited from outer token span) */
 .char.pending   { color: inherit; opacity: 0.4; }
 
-/* Typed chars: override with result colour */
-.char.correct   { color: var(--correct); opacity: 1; }
+/* Correct: keep the syntax colour, just brighten it and add a green underline */
+.char.correct   { color: inherit; opacity: 1; text-decoration: underline; text-decoration-color: var(--correct); text-underline-offset: 3px; }
+
+/* Incorrect: hard red override */
 .char.incorrect { color: var(--incorrect); opacity: 1; text-decoration: underline wavy var(--incorrect); }
 
 .char.cursor {
