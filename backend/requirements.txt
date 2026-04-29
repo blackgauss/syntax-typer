@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+pyyaml
+sqlalchemy
+pluggy
+tree-sitter
