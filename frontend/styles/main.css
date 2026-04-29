@@ -195,3 +195,19 @@ header h1 {
   transition: background 0.15s, color 0.15s;
 }
 .btn-retry:hover { background: var(--accent); color: var(--bg); }
+
+/* ── Status messages ── */
+.status-msg {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+  line-height: 1.7;
+}
+.status-msg.error {
+  color: var(--incorrect);
+  background: var(--surface);
+  border: 1px solid var(--incorrect);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}

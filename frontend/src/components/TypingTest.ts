@@ -19,7 +19,13 @@ export class TypingTest {
   }
 
   async init() {
-    this.snippet = await fetchSnippet();
+    this.renderLoading();
+    try {
+      this.snippet = await fetchSnippet();
+    } catch (e) {
+      this.renderError("Could not reach the backend at http://localhost:8000 — is it running?\n\nRun: make backend");
+      return;
+    }
     this.render();
     this.keyLogger.attach(this.container);
     this.resultsPanel = new ResultsPanel(
@@ -37,6 +43,23 @@ export class TypingTest {
 
     // Auto-focus on load
     input.focus();
+  }
+
+  private renderLoading() {
+    this.container.innerHTML = `
+      <header><h1>Syntax Typer</h1></header>
+      <main><p class="status-msg">Loading snippet…</p></main>
+    `;
+  }
+
+  private renderError(msg: string) {
+    this.container.innerHTML = `
+      <header><h1>Syntax Typer</h1></header>
+      <main>
+        <pre class="status-msg error">${msg}</pre>
+        <button class="btn-retry" onclick="location.reload()">Retry</button>
+      </main>
+    `;
   }
 
   private onInput(input: HTMLTextAreaElement) {
