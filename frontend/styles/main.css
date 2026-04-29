@@ -70,9 +70,16 @@ header h1 {
 }
 
 .char { position: relative; }
-.char.correct   { color: var(--correct); }
-.char.incorrect { color: var(--incorrect); text-decoration: underline wavy var(--incorrect); }
-.char.pending   { color: var(--pending); }
+
+/* Pending chars: show Prism syntax colour (inherited from outer token span) */
+.char.pending   { color: inherit; opacity: 0.4; }
+
+/* Correct: keep the syntax colour, just brighten it and add a green underline */
+.char.correct   { color: inherit; opacity: 1; text-decoration: underline; text-decoration-color: var(--correct); text-underline-offset: 3px; }
+
+/* Incorrect: hard red override */
+.char.incorrect { color: var(--incorrect); opacity: 1; text-decoration: underline wavy var(--incorrect); }
+
 .char.cursor {
   color: var(--cursor-fg);
   background: var(--cursor-bg);
@@ -80,28 +87,101 @@ header h1 {
   animation: blink 1s step-end infinite;
 }
 
+/* ── Prism token colours (Catppuccin-style palette) ── */
+.token.keyword            { color: #cba6f7; } /* mauve */
+.token.builtin            { color: #89dceb; }
+.token.function           { color: #89b4fa; } /* blue */
+.token.class-name         { color: #f9e2af; } /* yellow */
+.token.string             { color: #a6e3a1; } /* green */
+.token.template-string    { color: #a6e3a1; }
+.token.number             { color: #fab387; } /* peach */
+.token.boolean            { color: #fab387; }
+.token.operator           { color: #89dceb; } /* sky */
+.token.punctuation        { color: #9399b2; } /* overlay2 */
+.token.comment            { color: #6c7086; font-style: italic; } /* muted */
+.token.parameter          { color: #f38ba8; } /* red */
+.token.type               { color: #f9e2af; }
+.token.decorator          { color: #f5c2e7; } /* pink */
+.token.property           { color: #cdd6f4; }
+.token.attr-name          { color: #89b4fa; }
+.token.regex              { color: #f38ba8; }
+.token.important          { color: #fab387; font-weight: bold; }
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
 
+/* ── Display wrapper — overlay input lives here ── */
+.display-wrapper {
+  position: relative;
+  cursor: text;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Hidden textarea — captures all keystrokes ── */
 #typing-input {
-  width: 100%;
-  min-height: 120px;
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  resize: none;
+  border: none;
+  outline: none;
+}
+
+/* ── Snippet display — the visual typing canvas ── */
+#snippet-display {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1rem 1.25rem;
-  color: var(--text);
+  padding: 1.25rem 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.95rem;
   line-height: 1.7;
-  resize: vertical;
+  white-space: pre;
+  overflow-x: auto;
+  min-height: 80px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, opacity 0.2s;
+  user-select: none;
 }
-#typing-input:focus { border-color: var(--accent); }
-#typing-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Focused state — border lights up */
+.display-wrapper.is-focused #snippet-display {
+  border-color: var(--accent);
+}
+
+/* Unfocused state — dim + show hint */
+.display-wrapper:not(.is-focused) #snippet-display {
+  opacity: 0.4;
+}
+.display-wrapper:not(.is-focused) .click-to-focus {
+  display: flex;
+}
+
+/* Done state */
+#snippet-display.is-done {
+  border-color: var(--correct);
+  opacity: 1;
+}
+
+/* ── Click-to-focus hint overlay ── */
+.click-to-focus {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  border-radius: 8px;
+}
 
 .results-panel {
   margin-top: 1.5rem;
@@ -142,3 +222,19 @@ header h1 {
   transition: background 0.15s, color 0.15s;
 }
 .btn-retry:hover { background: var(--accent); color: var(--bg); }
+
+/* ── Status messages ── */
+.status-msg {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+  line-height: 1.7;
+}
+.status-msg.error {
+  color: var(--incorrect);
+  background: var(--surface);
+  border: 1px solid var(--incorrect);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}

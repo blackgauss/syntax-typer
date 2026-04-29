@@ -19,7 +19,13 @@ export class TypingTest {
   }
 
   async init() {
-    this.snippet = await fetchSnippet();
+    this.renderLoading();
+    try {
+      this.snippet = await fetchSnippet();
+    } catch (e) {
+      this.renderError("Could not reach the backend at http://localhost:8000 — is it running?\n\nRun: make backend");
+      return;
+    }
     this.render();
     this.keyLogger.attach(this.container);
     this.resultsPanel = new ResultsPanel(
@@ -30,6 +36,30 @@ export class TypingTest {
 
     const input = this.container.querySelector<HTMLTextAreaElement>("#typing-input")!;
     input.addEventListener("input", () => this.onInput(input));
+
+    // Clicking the display focuses the hidden input
+    const display = this.container.querySelector<HTMLPreElement>("#snippet-display")!;
+    display.addEventListener("click", () => input.focus());
+
+    // Auto-focus on load
+    input.focus();
+  }
+
+  private renderLoading() {
+    this.container.innerHTML = `
+      <header><h1>Syntax Typer</h1></header>
+      <main><p class="status-msg">Loading snippet…</p></main>
+    `;
+  }
+
+  private renderError(msg: string) {
+    this.container.innerHTML = `
+      <header><h1>Syntax Typer</h1></header>
+      <main>
+        <pre class="status-msg error">${msg}</pre>
+        <button class="btn-retry" onclick="location.reload()">Retry</button>
+      </main>
+    `;
   }
 
   private onInput(input: HTMLTextAreaElement) {
@@ -46,10 +76,10 @@ export class TypingTest {
     // Running correction count
     this.corrections = this.keyLogger.getLogs().filter((e) => e.isCorrection).length;
 
-    // Live diff render
+    // Live diff render directly into the display
     const states = diffChars(target, typed);
     const display = this.container.querySelector<HTMLPreElement>("#snippet-display")!;
-    display.innerHTML = renderDiff(states);
+    display.innerHTML = renderDiff(states, this.snippet.language);
 
     pluginManager.triggerKeyPress(typed[typed.length - 1] ?? "", Date.now());
 
@@ -68,6 +98,11 @@ export class TypingTest {
 
     const input = this.container.querySelector<HTMLTextAreaElement>("#typing-input")!;
     input.disabled = true;
+    input.blur();
+
+    // Mark the display as done
+    const display = this.container.querySelector<HTMLPreElement>("#snippet-display")!;
+    display.classList.add("is-done");
 
     const retry = document.createElement("button");
     retry.textContent = "Try Again";
@@ -89,6 +124,9 @@ export class TypingTest {
     );
     const input = this.container.querySelector<HTMLTextAreaElement>("#typing-input")!;
     input.addEventListener("input", () => this.onInput(input));
+    const display = this.container.querySelector<HTMLPreElement>("#snippet-display")!;
+    display.addEventListener("click", () => input.focus());
+    input.focus();
     pluginManager.triggerTestStart(this.snippet);
   }
 
@@ -105,15 +143,19 @@ export class TypingTest {
           <span class="snippet-lang">${this.snippet.language}</span>
           <span class="snippet-diff">${this.snippet.difficulty}</span>
         </div>
-        <pre id="snippet-display">${renderDiff(states)}</pre>
-        <textarea
-          id="typing-input"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          placeholder="Start typing..."
-        ></textarea>
+        <div class="display-wrapper">
+          <pre id="snippet-display" tabindex="0">${renderDiff(states, this.snippet.language)}</pre>
+          <div class="click-to-focus">Click to focus</div>
+          <textarea
+            id="typing-input"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            tabindex="-1"
+            aria-hidden="true"
+          ></textarea>
+        </div>
         <div id="results"></div>
       </main>
     `;

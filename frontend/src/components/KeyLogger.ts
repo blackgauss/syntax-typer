@@ -22,6 +22,11 @@ export class KeyLogger {
     this._input = input;
     input.focus();
 
+    const wrapper = container.querySelector<HTMLElement>(".display-wrapper");
+
+    input.addEventListener("focus", () => wrapper?.classList.add("is-focused"));
+    input.addEventListener("blur",  () => wrapper?.classList.remove("is-focused"));
+
     input.addEventListener("keydown", (e: KeyboardEvent) => {
       // Intercept Tab — insert 4 spaces, never shift focus
       if (e.key === "Tab") {
@@ -31,7 +36,8 @@ export class KeyLogger {
         input.value =
           input.value.substring(0, start) + "    " + input.value.substring(end);
         input.selectionStart = input.selectionEnd = start + 4;
-        // Fire as 4 space characters
+        // Manually fire input event so TypingTest.onInput() picks up the change
+        input.dispatchEvent(new Event("input", { bubbles: true }));
         "    ".split("").forEach((_, i) =>
           this._emit({ key: " ", timestamp: Date.now() + i, isCorrection: false, isSpecial: false })
         );
