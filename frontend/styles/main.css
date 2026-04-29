@@ -1,18 +1,20 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Theme ── */
 :root {
-  --bg: #1e1e2e;
-  --surface: #2a2a3d;
-  --text: #cdd6f4;
-  --muted: #6c7086;
-  --accent: #89b4fa;
-  --error: #f38ba8;
-  --success: #a6e3a1;
-  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  --bg:          #0f1117;
+  --surface:     #1a1d27;
+  --border:      #2e3245;
+  --text:        #cdd6f4;
+  --muted:       #6c7086;
+  --correct:     #a6e3a1;
+  --incorrect:   #f38ba8;
+  --cursor-bg:   #cdd6f4;
+  --cursor-fg:   #0f1117;
+  --pending:     #585b70;
+  --accent:      #89b4fa;
+  --font-mono:   "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 }
 
 body {
@@ -21,91 +23,122 @@ body {
   font-family: var(--font-mono);
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
+  justify-content: center;
+  padding: 2rem 1rem;
 }
+
+#app { width: 100%; max-width: 860px; }
 
 header h1 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: var(--accent);
+  letter-spacing: 0.08em;
   margin-bottom: 2rem;
-  letter-spacing: 0.1em;
-}
-
-main {
-  width: 100%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .snippet-meta {
   display: flex;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: var(--muted);
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
 }
-
-.snippet-title {
-  color: var(--accent);
-  font-weight: bold;
+.snippet-title { color: var(--text); font-weight: 600; }
+.snippet-lang, .snippet-diff {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
 }
 
 #snippet-display {
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-mono);
   font-size: 0.95rem;
   line-height: 1.7;
   white-space: pre;
   overflow-x: auto;
-  border: 1px solid #3b3b52;
+  margin-bottom: 1rem;
+  min-height: 80px;
+}
+
+.char { position: relative; }
+.char.correct   { color: var(--correct); }
+.char.incorrect { color: var(--incorrect); text-decoration: underline wavy var(--incorrect); }
+.char.pending   { color: var(--pending); }
+.char.cursor {
+  color: var(--cursor-fg);
+  background: var(--cursor-bg);
+  border-radius: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 #typing-input {
+  width: 100%;
+  min-height: 120px;
   background: var(--surface);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--border);
   border-radius: 8px;
+  padding: 1rem 1.25rem;
   color: var(--text);
   font-family: var(--font-mono);
   font-size: 0.95rem;
   line-height: 1.7;
-  padding: 1.25rem;
-  resize: none;
-  height: 160px;
+  resize: vertical;
   outline: none;
-  width: 100%;
+  transition: border-color 0.2s;
 }
-
-#typing-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.2);
-}
+#typing-input:focus { border-color: var(--accent); }
+#typing-input:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .results-panel {
+  margin-top: 1.5rem;
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1.25rem;
-  border: 1px solid #3b3b52;
+  padding: 1.25rem 1.5rem;
 }
-
 .results-panel h2 {
-  color: var(--accent);
-  margin-bottom: 0.75rem;
   font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
 }
-
 .results-panel ul {
   list-style: none;
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  font-size: 0.9rem;
-  color: var(--muted);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+.results-panel li { color: var(--muted); font-size: 0.85rem; }
+.results-panel strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.4rem;
+  margin-top: 2px;
 }
 
-.results-panel strong {
-  color: var(--text);
+.btn-retry {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
+.btn-retry:hover { background: var(--accent); color: var(--bg); }

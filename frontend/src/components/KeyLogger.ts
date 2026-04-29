@@ -5,15 +5,25 @@ export interface KeyEvent {
   isSpecial: boolean;
 }
 
+type KeyHandler = (event: KeyEvent) => void;
+
 export class KeyLogger {
   private log: KeyEvent[] = [];
+  private handlers: KeyHandler[] = [];
+  private _input: HTMLTextAreaElement | null = null;
+
+  onKey(handler: KeyHandler) {
+    this.handlers.push(handler);
+  }
 
   attach(container: HTMLElement) {
     const input = container.querySelector<HTMLTextAreaElement>("#typing-input");
     if (!input) return;
+    this._input = input;
+    input.focus();
 
     input.addEventListener("keydown", (e: KeyboardEvent) => {
-      // Intercept Tab — insert 4 spaces instead of moving focus
+      // Intercept Tab — insert 4 spaces, never shift focus
       if (e.key === "Tab") {
         e.preventDefault();
         const start = input.selectionStart ?? 0;
@@ -21,15 +31,26 @@ export class KeyLogger {
         input.value =
           input.value.substring(0, start) + "    " + input.value.substring(end);
         input.selectionStart = input.selectionEnd = start + 4;
+        // Fire as 4 space characters
+        "    ".split("").forEach((_, i) =>
+          this._emit({ key: " ", timestamp: Date.now() + i, isCorrection: false, isSpecial: false })
+        );
+        return;
       }
 
-      this.log.push({
+      const event: KeyEvent = {
         key: e.key,
         timestamp: Date.now(),
         isCorrection: e.key === "Backspace",
-        isSpecial: ["Tab", "Enter", "Backspace", "Shift", "Control", "Alt"].includes(e.key),
-      });
+        isSpecial: ["Enter", "Backspace", "Shift", "Control", "Alt", "Meta"].includes(e.key),
+      };
+      this._emit(event);
     });
+  }
+
+  private _emit(event: KeyEvent) {
+    this.log.push(event);
+    this.handlers.forEach((h) => h(event));
   }
 
   getLogs(): KeyEvent[] {
@@ -38,5 +59,6 @@ export class KeyLogger {
 
   reset() {
     this.log = [];
+    if (this._input) this._input.value = "";
   }
 }
