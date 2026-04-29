@@ -85,23 +85,76 @@ header h1 {
   50%       { opacity: 0; }
 }
 
+/* ── Display wrapper — overlay input lives here ── */
+.display-wrapper {
+  position: relative;
+  cursor: text;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Hidden textarea — captures all keystrokes ── */
 #typing-input {
-  width: 100%;
-  min-height: 120px;
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  resize: none;
+  border: none;
+  outline: none;
+}
+
+/* ── Snippet display — the visual typing canvas ── */
+#snippet-display {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1rem 1.25rem;
-  color: var(--text);
+  padding: 1.25rem 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.95rem;
   line-height: 1.7;
-  resize: vertical;
+  white-space: pre;
+  overflow-x: auto;
+  min-height: 80px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, opacity 0.2s;
+  user-select: none;
 }
-#typing-input:focus { border-color: var(--accent); }
-#typing-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Focused state — border lights up */
+.display-wrapper.is-focused #snippet-display {
+  border-color: var(--accent);
+}
+
+/* Unfocused state — dim + show hint */
+.display-wrapper:not(.is-focused) #snippet-display {
+  opacity: 0.4;
+}
+.display-wrapper:not(.is-focused) .click-to-focus {
+  display: flex;
+}
+
+/* Done state */
+#snippet-display.is-done {
+  border-color: var(--correct);
+  opacity: 1;
+}
+
+/* ── Click-to-focus hint overlay ── */
+.click-to-focus {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  border-radius: 8px;
+}
 
 .results-panel {
   margin-top: 1.5rem;

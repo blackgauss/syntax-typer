@@ -22,6 +22,11 @@ export class KeyLogger {
     this._input = input;
     input.focus();
 
+    const wrapper = container.querySelector<HTMLElement>(".display-wrapper");
+
+    input.addEventListener("focus", () => wrapper?.classList.add("is-focused"));
+    input.addEventListener("blur",  () => wrapper?.classList.remove("is-focused"));
+
     input.addEventListener("keydown", (e: KeyboardEvent) => {
       // Intercept Tab — insert 4 spaces, never shift focus
       if (e.key === "Tab") {
