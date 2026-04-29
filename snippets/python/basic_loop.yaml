@@ -1,0 +1,8 @@
+id: py_basic_loop
+language: python
+title: Basic For Loop
+difficulty: beginner
+tags: [loops, iteration]
+code: |
+  for i in range(10):
+      print(i)

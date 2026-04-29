@@ -1,0 +1,9 @@
+id: ts_arrow_function
+language: typescript
+title: Arrow Function
+difficulty: beginner
+tags: [functions, es6, arrow]
+code: |
+  const greet = (name: string): string => {
+    return `Hello, ${name}!`;
+  };
